@@ -1,0 +1,150 @@
+
+:root {
+    --primary-color: #212121;
+    --background-color: #111;
+    --font: sans-serif;
+    --green: #1DB954;
+    --title-color: white;
+    --text-bg-color: #333;
+    --text-color: gray;
+    --bg-color:rgb(30, 82, 100);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background: var(--bg-color);
+    display: flex;
+    justify-content: center;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 30px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+#questions {
+    margin: 200px;
+    margin-top: 0px;
+    padding: 20px;
+    position: relative;
+    min-width: 500px;
+    flex-direction: column;
+}
+
+/* ennoncé */
+#question {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--text-bg-color);
+    color: var(--text-color);
+    padding: 10px;
+    border-radius: 20px;
+    margin: 30px;
+    margin-top: 150px;
+    margin-right: 150px;
+    margin-left: 150px;
+    border: 5px solid black;
+    min-width: 600px;
+    max-width: 1200px;
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--text-bg-color);
+    color: var(--text-color);
+    padding: 10px;
+    border-radius: 50px;
+    margin: 30px;
+    border: 5px solid black;
+}
+
+.card:hover {
+    cursor: pointer;
+    border-color: white;
+}
+
+.title {
+    color: var(--title-color);
+    position: relative;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    margin: 20px auto;
+    width: 500px;
+    /* height: 240px; */
+    border-radius: 10px;
+    flex-wrap: wrap;
+    font-size: 30px;
+    text-align: center;
+    padding: 10px;
+}
+
+.modal-item {
+    flex: 50%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 15px;
+    background: var(--text-bg-color);
+    color: white;
+}
+
+.modal-input {
+    margin: 10px;
+    /* margin-top: 30px; */
+    padding: 10px;
+    border-radius: 10px;
+    background: white;
+    width: 80%;
+}
+
+
+.modal-button {
+    background-color: white;
+    border-radius: 10px;
+    padding: 16px 32px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.modal-button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+.modal-top {
+    background-color: var(--green);
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+}

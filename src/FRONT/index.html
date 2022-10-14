@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIZ</title>
+    <meta name="author" content="Thibault Chatillon" />
+    <link rel="icon" href="" />
+    <link rel="stylesheet" href="index.css" />
+</head>
+
+
+<body>
+    <div class="flex-container">
+
+        <div id="question">
+            <h3 class="title" id="category">Title 3</h3>
+            <p id="question-text">capitale du brésil ?</p>
+        </div>
+
+        <div id="questions">
+
+            <!-- <div class="card" onclick="pick(0)">
+                <h3 class="title">Jaune</h3>
+            </div> -->
+
+        </div>
+
+    </div>
+
+    <div id="modal" onsubmit="event.preventDefault()" class="modal">
+
+        <div class="modal-content">
+            <div class="modal-top">Login with JWT</div>
+            <input id="token" class="modal-input" type="text">
+            <button class="modal-button" onclick="login_jwt()">play</button>
+       
+            <div class="modal-top">Login</div>
+            <input id="username_login" class="modal-input" placeholder="théodule" type="text" value="théodule">
+            <input id="password_login" class="modal-input" placeholder="1234" type="password" value="1234">
+            <button class="modal-button" onclick="login()">play</button>
+       
+            <div class="modal-top"> Sign up</div>
+            <input id="username_signup" class="modal-input" placeholder="username" type="text">
+            <input id="password_signup" class="modal-input" placeholder="password" type="password">
+            <button class="modal-button" onclick="signup()">sign up</button>
+      
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
