@@ -1,29 +1,17 @@
 # lol-quiz
 
-server has ref to
+# quirks
 
-- fetcher
-- socket
+works using nodemon linux/windows
 
-no complex auth, simple username is enough to have scoreboard
-
-3 lifes (wrong choices)
-rapidity quiz
-
-works using nodemon (front path ok)
 but if build and run fails bcp files are searched under /build/FRONT
+works only on linux (no cp on windows... cmdline)
 
-now works but only on linux (no cp on windows... cmdline)
+# todo
 
-idea for questions
-: ornn upgrades correspondance
+- create questions
+- implement audio/image
+- prevent double tap/from multiple player (take only first event into account for each round)
 
-images reconnaitre le champ
-
-sound reconnaitre le champ
-
-stats d'un item
-
-item cost
-
-ornn upgrades name
+- better interface
+- responsive for mobile (xd)
