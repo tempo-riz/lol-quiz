@@ -6,6 +6,9 @@ const modalContent = document.getElementsByClassName('modal-content')[0];
 const category = document.getElementById("category");
 const question_txt = document.getElementById("question-text");
 const questions = document.getElementById("questions");
+const sidePanel = document.getElementById("side-panel");
+const round = document.getElementById("round");
+const score = document.getElementById("score");
 
 
 //used to highligh correct answer
@@ -30,6 +33,7 @@ function pick(i) {
     if (!canPick) {
         return;
     }
+    console.log("pick", i);
     canPick = false;
     currentTryIndex = i
     socket.emit('pick', currentPropositions[i])
@@ -52,39 +56,32 @@ socket.on('wait', (players, _isHost) => {
         isHost = true;
     }
     //waiting updating status (1/x users)
-    let html = `
-    <div class="modal-top">
-    Waiting for host to start the game`;
+    let html = `<div class="modal-top"> Waiting for host to start the game </div>`;
 
     for (let i = 0; i < players.length; i++) {
         html += `<div class="player ${i == 0 ? 'host' : ''}">` + players[i] + `${i == 0 ? '(host)' : ''}</div>`;
     }
     if (isHost) {
-        //create a button dom element and add it to the html
-        const button = document.createElement('button');
-        button.innerHTML = 'Start Game';
-        button.classList.add('modal-button');
-        button.onclick = () => {
-            socket.emit('start');
-        }
-        html += button.outerHTML;
-
-
+        html += `<button class="start modal-button" onclick="socket.emit('start')">Start Game</button>`;
     }
     html += `</div>`;
 
     modalContent.innerHTML = html;
 })
 
-socket.on('newTurn', q => {
+
+socket.on('newTurn', (q, crt, max, players) => {
+    sidePanel.style.display = "block";
 
     //wait before next round (to know if try was correct or not)
     setTimeout(() => {
         canPick = true;
         modal.style.display = "none";
+        round.innerHTML = `${crt} of ${max}`;
 
-        category.innerHTML = q.category;
-        question_txt.innerHTML = q.text;
+
+        category.innerHTML = q.type;
+        question_txt.innerHTML = q.question;
         questions.innerHTML = '';
 
         for (let i = 0; i < q.propositions.length; i++) {
@@ -95,25 +92,38 @@ socket.on('newTurn', q => {
             </div>`
         }
         currentPropositions = q.propositions;
+        score.innerHTML = '';
+        for (const p of players) {
+            score.innerHTML += `<div class="player-score" id="user_${p.username}">${p.username} : ${p.points}</div>`;
+        }
 
     }, 1000);
 });
 
-socket.on('result', result => {
+socket.on('result', (result, username) => {
     //highligh correct green
     document.getElementById("card" + currentPropositions.indexOf(result.correct)).style.borderColor = "green";
+
     //and wrong red
     if (result.wrong) {
         document.getElementById("card" + currentPropositions.indexOf(result.wrong)).style.borderColor = "red";
+        document.getElementById("user_" + username).style.borderColor = "red";
+
+    } else {
+        document.getElementById("user_" + username).style.borderColor = "green";
+
     }
 })
 
 socket.on('gameOver', score => {
-    modalContent.innerHTML = "";
-    score.sort((a, b) => { return b.points - a.points }).forEach(player => {
-        modalContent.innerHTML += `<p class="modal-item">${player.username} : ${player.points}</p>`
-    });
-    modal.style.display = "block";
     socket.close();
+    setTimeout(() => {
+
+        modalContent.innerHTML = "";
+        score.sort((a, b) => { return b.points - a.points }).forEach(player => {
+            modalContent.innerHTML += `<p class="modal-item">${player.username} : ${player.points}</p>`
+        });
+        modal.style.display = "block";
+    }, 1000);
 })
 

@@ -1,8 +1,9 @@
 import * as IO from 'socket.io';
 import http from 'http';
 import Fetcher from './fetcher';
+import { question } from './types';
 
-type Player = {
+type player = {
   username: string;
   points: number;
   socketId: string;
@@ -10,12 +11,12 @@ type Player = {
 };
 
 class ServerIO extends IO.Server {
-  private maxPlayers: number = parseInt(process.env.MAX_PLAYERS);
-  private maxRound: number = parseInt(process.env.MAX_ROUNDS);
+  private maxRound = 5;
   //to reset after gameOver
-  private players: Player[] = [];
+  private players: player[] = [];
   private currentRound = 0;
-  private host: Player;
+  private host: player;
+  crtQuestion: question;
 
   constructor(server: http.Server, private fetcher: Fetcher) {
     super(server, {
@@ -36,7 +37,7 @@ class ServerIO extends IO.Server {
   private registerEventsOnSocket(socket: IO.Socket) {
     socket.on('join', (username: string) => {
       //create player
-      const p: Player = {
+      const p: player = {
         username: username,
         points: 0,
         socketId: socket.id,
@@ -61,43 +62,53 @@ class ServerIO extends IO.Server {
       );
     });
 
-    socket.on('start', () => {
+    socket.on('start', (nb_round) => {
+      // this.maxRound = nb_round;
+      // console.log('start game with', nb_round, 'rounds');
       this.newTurn();
     });
 
     socket.on('pick', (value) => {
-      //   const correct = value == this.crtQuestion.answer;
-      //   for (let i = 0; i < this.score.length; i++) {
-      //     //get player by socket id
-      //     if (this.score[i].socketId == socket.id) {
-      //       if (correct) {
-      //         this.to('quiz').emit('result', { correct: value });
-      //         this.score[i].points++;
-      //         console.log(this.score[i].username + ' was correct !');
-      //       } else {
-      //         this.to('quiz').emit('result', { correct: this.crtQuestion.answer, wrong: value });
-      //         this.score[i].points -= 2;
-      //         console.log(this.score[i].username + ' was wrong !');
-      //       }
-      //     }
-      //   }
-      //   if (this.currentRound++ < this.maxRound) {
-      //     console.log('round ' + this.currentRound + '/' + this.maxRound);
-      //     this.newTurn();
-      //   } else {
-      //     this.gameOver();
-      //   }
+      const correct = value == this.crtQuestion.correct_answer;
+      const p = this.players.find((p) => p.socketId == socket.id);
+
+      //get player by socket id
+      if (correct) {
+        this.to('quiz').emit('result', { correct: value }, p.username, p.points);
+        p.points++;
+        console.log(p.username + ' was correct !');
+      } else {
+        this.to('quiz').emit('result', { correct: this.crtQuestion.correct_answer, wrong: value }, p.username, p.points);
+        p.points--;
+        // p.lifes--;
+        // if (p.lifes == 0) {
+        //   this.to('quiz').emit('playerLost', p.username);
+        //   console.log(p.username + 'is dead');
+
+        //   this.players = this.players.filter((p) => p.lifes > 0);
+        // }
+        console.log(p.username + ' was wrong !');
+      }
+
+      if (this.currentRound++ < this.maxRound) {
+        console.log('round ' + this.currentRound + '/' + this.maxRound);
+        this.newTurn();
+      } else {
+        this.gameOver();
+      }
     });
 
     socket.on('disconnect', () => {
       console.log(this.players.filter((p) => p.socketId != socket.id)[0]?.username + ' left room');
+      // this.players = this.players.filter((p) => p.socketId != socket.id);
     });
   }
 
   newTurn() {
     //get random question
-    // this.crtQuestion = this.fetcher.getRandomQuestion();
-    // this.to('quiz').emit('newTurn', this.crtQuestion);
+    this.crtQuestion = this.fetcher.getRandomOrnnQuestion();
+    //send question to players
+    this.to('quiz').emit('newTurn', this.fetcher.ToOpaque(this.crtQuestion), this.currentRound, this.maxRound, this.players);
   }
 
   gameOver() {

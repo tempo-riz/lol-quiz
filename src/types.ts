@@ -1,9 +1,3 @@
-enum userType {
-  GUEST,
-  PLAYER,
-  ADMIN
-}
-
 type skin = {
   id: string;
   num: number;
@@ -27,6 +21,13 @@ type champion = {
   spells: Array<spell>;
   skins: Array<skin>;
   partype: string; //ressource type "Mana"...
+};
+
+type opaque = {
+  type: string;
+  difficulty: number;
+  question: string;
+  propositions: Array<string>;
 };
 
 type question = {
@@ -65,4 +66,4 @@ type item = {
   };
 };
 
-export { champion, spell, skin, item, question };
+export { champion, spell, skin, item, question, opaque };
