@@ -13,7 +13,7 @@ class Server {
   private readonly backend: Express;
   private readonly server: http.Server;
   private readonly io: IO.Server;
-  private readonly fetcher: Fetcher;
+  readonly fetcher: Fetcher;
 
   constructor() {
     this.backend = express();
@@ -24,8 +24,8 @@ class Server {
     this.backend.use(express.static(path.join(__dirname, 'FRONT')));
 
     this.server = http.createServer(this.backend);
-    this.io = new ServerIO(this.server);
     this.fetcher = new Fetcher();
+    this.io = new ServerIO(this.server, this.fetcher);
 
     this.backend.get('/', (req: express.Request, res: express.Response) => {
       console.log('get index.html');

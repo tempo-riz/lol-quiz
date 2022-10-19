@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const API_URL = "http://0.0.0.0:8080";
+const API_URL = "http://localhost:8080";
 
 const modal = document.getElementById("modal");
 const modalContent = document.getElementsByClassName('modal-content')[0];
@@ -13,59 +13,18 @@ let currentPropositions = [];
 let currentTryIndex;
 let canPick = false;
 
-function login_jwt() {
-    const token = document.getElementById('token').value
-    auth(token)
-}
 
 function login() {
-    const username = document.getElementById('username_login').value
-    const pwd = document.getElementById('password_login').value
-
-    fetch(`${API_URL}/login`, {
-        method: 'POST', //
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            username: username,
-            password: pwd
-        }
-        ) // body data type must match "Content-Type" header
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data.token)
-            auth(data.token)
-        });
+    const username = document.getElementById('username').value
+    if (username.length > 0) {
+        socket.open()
+        socket.emit('join', username)
+    } else {
+        document.getElementById('username').focus()
+    }
 }
 
-function signup() {
-    const username = document.getElementById('username_signup').value
-    const pwd = document.getElementById('password_signup').value
 
-    fetch(`${API_URL}/signup`, {
-        method: 'POST', //
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            username: username,
-            password: pwd
-        }
-        ) // body data type must match "Content-Type" header
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data.token)
-            auth(data.token)
-        });
-}
-
-function auth(token) {
-    socket.open()
-    socket.emit('auth', token)
-}
 
 function pick(i) {
     if (!canPick) {
@@ -85,12 +44,36 @@ socket.on('invalid', err => {
     alert(err);
 })
 
-socket.on('wait', status => {
+var isHost = false;
+
+socket.on('wait', (players, _isHost) => {
+
+    if (_isHost) { //sd it doesnt reset the host
+        isHost = true;
+    }
     //waiting updating status (1/x users)
-    modalContent.innerHTML = `
+    let html = `
     <div class="modal-top">
-    Waiting players : ${status}
-    </div>`
+    Waiting for host to start the game`;
+
+    for (let i = 0; i < players.length; i++) {
+        html += `<div class="player ${i == 0 ? 'host' : ''}">` + players[i] + `${i == 0 ? '(host)' : ''}</div>`;
+    }
+    if (isHost) {
+        //create a button dom element and add it to the html
+        const button = document.createElement('button');
+        button.innerHTML = 'Start Game';
+        button.classList.add('modal-button');
+        button.onclick = () => {
+            socket.emit('start');
+        }
+        html += button.outerHTML;
+
+
+    }
+    html += `</div>`;
+
+    modalContent.innerHTML = html;
 })
 
 socket.on('newTurn', q => {

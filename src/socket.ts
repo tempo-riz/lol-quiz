@@ -1,27 +1,30 @@
 import * as IO from 'socket.io';
 import http from 'http';
+import Fetcher from './fetcher';
 
 type Player = {
   username: string;
   points: number;
   socketId: string;
+  lifes: number;
 };
 
 class ServerIO extends IO.Server {
   private maxPlayers: number = parseInt(process.env.MAX_PLAYERS);
   private maxRound: number = parseInt(process.env.MAX_ROUNDS);
   //to reset after gameOver
-  private score: Player[] = [];
+  private players: Player[] = [];
   private currentRound = 0;
+  private host: Player;
 
-  constructor(server: http.Server) {
+  constructor(server: http.Server, private fetcher: Fetcher) {
     super(server, {
       cors: {
         origin: '*'
       }
     });
 
-    //init db
+    this.fetcher = fetcher;
 
     this.on('connection', (socket: IO.Socket) => {
       // logger.info(`Nouveau socket vers ${socket.client.conn.remoteAddress}`);
@@ -31,26 +34,35 @@ class ServerIO extends IO.Server {
   }
 
   private registerEventsOnSocket(socket: IO.Socket) {
-    socket.on('auth', (username) => {
+    socket.on('join', (username: string) => {
       //create player
       const p: Player = {
         username: username,
         points: 0,
-        socketId: socket.id
+        socketId: socket.id,
+        lifes: 3
       };
-      this.score.push(p);
+      //first to join becomes host
+      if (this.players.length == 0) {
+        this.host = p;
+        console.log(p.username + ' created room');
+      } else {
+        console.log(p.username + ' joined room');
+      }
+      this.players.push(p);
 
       //join room
-      const status = this.score.length + '/' + this.maxPlayers;
       socket.join('quiz');
-      this.to('quiz').emit('wait', status);
-      console.log(p.username + ' joined room, ' + status);
+      //wait host to start the game
+      this.to('quiz').emit(
+        'wait',
+        this.players.map((p) => p.username),
+        this.host.username == p.username //is host
+      );
+    });
 
-      if (this.score.length >= this.maxPlayers) {
-        console.log('starting !');
-        this.newTurn();
-      }
-      //else wait more players
+    socket.on('start', () => {
+      this.newTurn();
     });
 
     socket.on('pick', (value) => {
@@ -77,24 +89,24 @@ class ServerIO extends IO.Server {
       //   }
     });
 
-    socket.on('disconnect', (_) => {
-      console.log('a user disconected');
+    socket.on('disconnect', () => {
+      console.log(this.players.filter((p) => p.socketId != socket.id)[0]?.username + ' left room');
     });
   }
 
   newTurn() {
     //get random question
-    // this.crtQuestion = this.questions.getRandom();
+    // this.crtQuestion = this.fetcher.getRandomQuestion();
     // this.to('quiz').emit('newTurn', this.crtQuestion);
   }
 
   gameOver() {
     console.log('game over');
 
-    this.to('quiz').emit('gameOver', this.score);
+    this.to('quiz').emit('gameOver', this.players);
 
     //reset for next game
-    this.score = [];
+    this.players = [];
     this.currentRound = 0;
   }
 }

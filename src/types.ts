@@ -29,4 +29,40 @@ type champion = {
   partype: string; //ressource type "Mana"...
 };
 
-export { champion, spell, skin };
+type question = {
+  type: string;
+  difficulty: number;
+  question: string;
+  correct_answer: string;
+  incorrect_answers: Array<string>;
+};
+
+//filter not in store ! and ornn upgrades with following fields :
+// inStore: boolean;
+// requiredAlly: string;
+
+type item = {
+  id: string;
+  name: string;
+  description: string;
+  from: Array<string>; //items needed to build this item
+  into: Array<string>; //items that can be built from this item
+  gold: {
+    base: number;
+    total: number;
+    sell: number;
+  };
+  stats: {
+    hp: number;
+    ad: number;
+    ap: number;
+    as: number;
+    cdr: number; //ability haste
+    mr: number;
+    armor: number;
+    ms: number;
+    range: number;
+  };
+};
+
+export { champion, spell, skin, item, question };
