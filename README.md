@@ -4,7 +4,7 @@
 
 works using nodemon linux/windows
 
-but if build and run fails bcp files are searched under /build/FRONT
+but if build and run fails( files are searched under /build/FRONT)
 works only on linux (no cp on windows... cmdline)
 
 # todo
@@ -15,3 +15,15 @@ works only on linux (no cp on windows... cmdline)
 
 - better interface
 - responsive for mobile (xd)
+
+# questions ideas
+## items
+- ornn upgrades
+- guess from stats/price
+## champs
+- guess champ from one of its voicelines
+- guess champ from a spell icon
+- guess champ from it's skins
+
+from ddragon : stats for champs/items, spell icons 64x64
+from 
