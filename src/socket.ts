@@ -2,6 +2,7 @@ import * as IO from 'socket.io';
 import http from 'http';
 import Fetcher from './fetcher';
 import { question } from './types';
+import QuestionDB from './questionDB';
 
 type player = {
   username: string;
@@ -17,15 +18,16 @@ class ServerIO extends IO.Server {
   private currentRound = 0;
   private host: player;
   crtQuestion: question;
+  db:QuestionDB;
 
-  constructor(server: http.Server, private fetcher: Fetcher) {
+  constructor(server: http.Server, db: QuestionDB) {
     super(server, {
       cors: {
         origin: '*'
       }
     });
 
-    this.fetcher = fetcher;
+    this.db = db;
 
     this.on('connection', (socket: IO.Socket) => {
       // logger.info(`Nouveau socket vers ${socket.client.conn.remoteAddress}`);
@@ -106,9 +108,9 @@ class ServerIO extends IO.Server {
 
   newTurn() {
     //get random question
-    this.crtQuestion = this.fetcher.getRandomOrnnQuestion();
+    this.crtQuestion = this.db.getRandomOrnnQuestion();
     //send question to players
-    this.to('quiz').emit('newTurn', this.fetcher.ToOpaque(this.crtQuestion), this.currentRound, this.maxRound, this.players);
+    this.to('quiz').emit('newTurn', this.db.ToOpaque(this.crtQuestion), this.currentRound, this.maxRound, this.players);
   }
 
   gameOver() {

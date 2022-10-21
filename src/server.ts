@@ -8,6 +8,7 @@ import ServerIO from './socket';
 import bodyParser from 'body-parser';
 import path from 'path';
 import Fetcher from './fetcher';
+import QuestionDB from './questionDB';
 
 class Server {
   private readonly backend: Express;
@@ -25,7 +26,7 @@ class Server {
 
     this.server = http.createServer(this.backend);
     this.fetcher = new Fetcher();
-    this.io = new ServerIO(this.server, this.fetcher);
+    this.io = new ServerIO(this.server, this.fetcher.db);
 
     this.backend.get('/', (req: express.Request, res: express.Response) => {
       console.log('get index.html');

@@ -1,21 +1,12 @@
 import { RequestInfo, RequestInit } from 'node-fetch';
+import QuestionDB from './questionDB';
 import { champion, spell, skin, question, item, opaque } from './types';
 const fetch = (url: RequestInfo, init?: RequestInit) => import('node-fetch').then(({ default: fetch }) => fetch(url, init));
 
 let DRAGON_VERSION: number;
 
-function randInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 class Fetcher {
-  usedRandoms: number[] = [];
-  champs: Array<champion> = [];
-  ornnUpgrades: item[];
-  mythics: item[];
-  legendary: item[];
-  items: item[] = [];
-  boots: item[];
+  db:QuestionDB;
 
   async setDragonVersion() {
     await fetch('https://ddragon.leagueoflegends.com/api/versions.json', {
@@ -109,81 +100,16 @@ class Fetcher {
   //   return allChamps;
   // }
 
-  //gererate random number that haven't been generated before
-  random(max: number): number {
-    let rand;
-    do {
-      rand = randInt(0, max);
-    } while (this.usedRandoms.includes(rand));
-    this.usedRandoms.push(rand);
-
-    return rand;
-  }
-
-  RandomAndClear(max: number): number {
-    const rand = this.random(max);
-    this.usedRandoms = [];
-    return rand;
-  }
 
   async loadChamps(): Promise<void> {
     console.time('champs loaded');
 
     const champNames: Array<string> = await this.getChampionsList();
     const results = await Promise.all(champNames.map((champName) => this.getChampInfo(champName)));
-    this.champs = results;
+    this.db.champs = results;
     console.timeEnd('champs loaded');
   }
 
-  getRandomLegendary(): item {
-    return this.legendary[this.random(this.legendary.length - 1)];
-  }
-
-  getRandomMythic(): item {
-    return this.mythics[this.random(this.mythics.length - 1)];
-  }
-
-  getRandomItem(): item {
-    return this.items[this.random(this.items.length - 1)];
-  }
-
-  getRandomOrnnUpgrade(): item {
-    return this.ornnUpgrades[this.random(this.ornnUpgrades.length - 1)];
-  }
-
-  getRandomChamp(): champion {
-    return this.champs[this.random(this.champs.length - 1)];
-  }
-
-  getRandomOrnnQuestion(): question {
-    const ornn_item = this.getRandomOrnnUpgrade();
-    const id = ornn_item.from[0];
-
-    //make sure the item are unique
-    const i = this.mythics.findIndex((item) => item.id === id);
-    this.usedRandoms.push(i);
-
-    const question: question = {
-      type: 'ornn',
-      difficulty: 5,
-      question: `What item upgrades into ${ornn_item.name} ?`,
-      correct_answer: this.mythics[i].name,
-      incorrect_answers: [this.getRandomMythic().name, this.getRandomMythic().name, this.getRandomMythic().name]
-    };
-    this.usedRandoms = []; //clear used randoms
-    return question;
-  }
-
-  ToOpaque(question: question): opaque {
-    const opaque: opaque = {
-      type: question.type,
-      difficulty: question.difficulty,
-      question: question.question,
-      //randomize answers
-      propositions: [question.correct_answer, ...question.incorrect_answers].sort(() => Math.random() - 0.5)
-    };
-    return opaque;
-  }
 
   //get all items object and returns array of items and orrn's upgrades
   async loadItems(): Promise<void> {
@@ -250,11 +176,11 @@ class Fetcher {
             }
           }
         }
-        this.mythics = mythics;
-        this.legendary = legendary;
-        this.items = [...mythics, ...legendary];
-        this.ornnUpgrades = ornnUpgrades;
-        this.boots = boots;
+        this.db.mythics = mythics;
+        this.db.legendary = legendary;
+        this.db.items = [...mythics, ...legendary];
+        this.db.ornnUpgrades = ornnUpgrades;
+        this.db.boots = boots;
         // console.log('mythics', mythics.length);
         // console.log('legendary', legendary.length);
         // console.log('ornnUpgrades', ornnUpgrades.length);
@@ -266,6 +192,7 @@ class Fetcher {
   }
 
   constructor() {
+    this.db=new QuestionDB();
     try {
       this.setDragonVersion().then(() => {
         this.loadChamps();

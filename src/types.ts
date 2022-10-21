@@ -23,6 +23,15 @@ type champion = {
   partype: string; //ressource type "Mana"...
 };
 
+enum questionType {
+  Ornn,
+  Items,
+  Stats,
+  Voicelines,
+  Spells,
+  Skins,
+}
+
 type opaque = {
   type: string;
   difficulty: number;
@@ -30,8 +39,10 @@ type opaque = {
   propositions: Array<string>;
 };
 
+
+
 type question = {
-  type: string;
+  type: questionType;
   difficulty: number;
   question: string;
   correct_answer: string;
@@ -66,4 +77,4 @@ type item = {
   };
 };
 
-export { champion, spell, skin, item, question, opaque };
+export { champion, spell, skin, item, question, opaque,questionType };
