@@ -3,12 +3,13 @@ const API_URL = "http://localhost:8080";
 
 const modal = document.getElementById("modal");
 const modalContent = document.getElementsByClassName('modal-content')[0];
-const category = document.getElementById("category");
+// const category = document.getElementById("category");
 const question_txt = document.getElementById("question-text");
 const questions = document.getElementById("questions");
 const sidePanel = document.getElementById("side-panel");
 const round = document.getElementById("round");
 const score = document.getElementById("score");
+const audio_container = document.getElementById("audio_container");
 
 
 //used to highligh correct answer
@@ -37,6 +38,8 @@ function pick(i) {
     canPick = false;
     currentTryIndex = i
     socket.emit('pick', currentPropositions[i])
+    audio_container.style.visibility = "hidden";
+
 }
 
 const socket = io(API_URL, {
@@ -69,18 +72,42 @@ socket.on('wait', (players, _isHost) => {
     modalContent.innerHTML = html;
 })
 
+let audio;
+
+function replayAudio() {
+    audio.play();
+    audio_container.style.visibility = "hidden";
+
+}
 
 socket.on('newTurn', (q, crt, max, players) => {
     sidePanel.style.display = "block";
 
+    console.log(q.type);
+    if (q.type == "Voiceline" || q.type == "Sfx") {
+        //stop previous audio
+        if (audio) {
+            audio.pause();
+        }
+        audio = new Audio(q.src);
+        audio.onended = () => {
+            audio_container.style.visibility = "visible";
+            // audio_container.onclick = replayAudio
+        }
+        setTimeout(() => {
+            audio.play()
+        }, 1500);
+    }
+
     //wait before next round (to know if try was correct or not)
     setTimeout(() => {
+
         canPick = true;
         modal.style.display = "none";
         round.innerHTML = `${crt} of ${max}`;
 
 
-        category.innerHTML = q.type;
+        // category.innerHTML = q.type;
         question_txt.innerHTML = q.question;
         questions.innerHTML = '';
 

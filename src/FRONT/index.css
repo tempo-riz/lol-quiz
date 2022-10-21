@@ -13,6 +13,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 
 body {
@@ -54,6 +55,7 @@ body {
     position: relative;
     min-width: 500px;
     flex-direction: column;
+    margin-bottom: 0;
 }
 
 /* ennoncé */
@@ -184,4 +186,24 @@ body {
     border-radius: 20px;
     /* border-color: var(--green); */
 
+}
+
+i {
+    color: white;
+    font-size: 25px;
+    padding: 5px;
+}
+
+#audio_container {
+    margin-top: 0;
+    padding: 10px;
+    padding-left: 12px;
+    border-radius: 40px;
+    border: 5px solid white;
+    visibility: hidden;
+}
+
+#audio_container:hover {
+    cursor: pointer;
+    border-color: white;
 }

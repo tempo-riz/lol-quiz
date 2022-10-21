@@ -18,7 +18,7 @@ class ServerIO extends IO.Server {
   private currentRound = 0;
   private host: player;
   crtQuestion: question;
-  db:QuestionDB;
+  db: QuestionDB;
 
   constructor(server: http.Server, db: QuestionDB) {
     super(server, {
@@ -108,7 +108,7 @@ class ServerIO extends IO.Server {
 
   newTurn() {
     //get random question
-    this.crtQuestion = this.db.getRandomOrnnQuestion();
+    this.crtQuestion = this.db.getRandomQuestion();
     //send question to players
     this.to('quiz').emit('newTurn', this.db.ToOpaque(this.crtQuestion), this.currentRound, this.maxRound, this.players);
   }

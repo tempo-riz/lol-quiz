@@ -5,4 +5,8 @@ import env from 'dotenv';
 import Server from './server';
 env.config();
 
-new Server().run();
+//wait 2 seconds to fetch before starting server to make sure the db is ready
+const server = new Server();
+setTimeout(() => {
+  server.run();
+}, 2000);

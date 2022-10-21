@@ -8,7 +8,6 @@ import ServerIO from './socket';
 import bodyParser from 'body-parser';
 import path from 'path';
 import Fetcher from './fetcher';
-import QuestionDB from './questionDB';
 
 class Server {
   private readonly backend: Express;

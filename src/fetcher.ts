@@ -6,7 +6,7 @@ const fetch = (url: RequestInfo, init?: RequestInit) => import('node-fetch').the
 let DRAGON_VERSION: number;
 
 class Fetcher {
-  db:QuestionDB;
+  db: QuestionDB;
 
   async setDragonVersion() {
     await fetch('https://ddragon.leagueoflegends.com/api/versions.json', {
@@ -100,7 +100,6 @@ class Fetcher {
   //   return allChamps;
   // }
 
-
   async loadChamps(): Promise<void> {
     console.time('champs loaded');
 
@@ -109,7 +108,6 @@ class Fetcher {
     this.db.champs = results;
     console.timeEnd('champs loaded');
   }
-
 
   //get all items object and returns array of items and orrn's upgrades
   async loadItems(): Promise<void> {
@@ -138,7 +136,15 @@ class Fetcher {
             from: content.data[itemNames[i]].from,
             into: content.data[itemNames[i]].into,
             gold: content.data[itemNames[i]].gold,
-            stats: content.data[itemNames[i]].stats
+            stats: {
+              hp: content.data[itemNames[i]].stats.FlatHPPoolMod || 0,
+              ad: content.data[itemNames[i]].stats.FlatPhysicalDamageMod || 0,
+              ap: content.data[itemNames[i]].stats.FlatMagicDamageMod || 0,
+              as: content.data[itemNames[i]].stats.PercentAttackSpeedMod * 10 || 0,
+              mr: content.data[itemNames[i]].stats.FlatSpellBlockMod || 0,
+              armor: content.data[itemNames[i]].stats.FlatArmorMod || 0,
+              ms: content.data[itemNames[i]].stats.FlatMovementSpeedMod || 0
+            }
           };
 
           //remove ARAM (11 is 5v5 rift)
@@ -192,7 +198,7 @@ class Fetcher {
   }
 
   constructor() {
-    this.db=new QuestionDB();
+    this.db = new QuestionDB();
     try {
       this.setDragonVersion().then(() => {
         this.loadChamps();
