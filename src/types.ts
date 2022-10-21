@@ -23,17 +23,6 @@ type champion = {
   partype: string; //ressource type "Mana"...
 };
 
-// ## items
-// - ornn upgrades
-// - guess from stats/price
-// ## champs
-// - guess champ from one of its voicelines
-// - guess champ from a spell icon
-// - guess champ from it's skins
-// - guess champ from a spell name
-// ## spells
-// - guess cooldowns
-
 enum questionType {
   Ornn,
   Price,
@@ -60,54 +49,6 @@ type question = {
   incorrect_answers: Array<string>;
   src?: string;
 };
-
-// type stats = {
-//   FlatPhysicalDamageMod:"AD";
-//   FlatMagicDamageMod:"AP";
-//   FlatHPPoolMod:"HP";
-//   FlatMPPoolMod:"MP";
-//   FlatArmorMod:"Armor";
-//   FlatSpellBlockMod:"MR";
-//   FlatCritChanceMod:"Crit";
-//   FlatMovementSpeedMod:"MS";
-//   FlatAttackSpeedMod:"AS";
-//   PercentAttackSpeedMod:"%AS";
-//   PercentMovementSpeedMod:"%MS";
-//   PercentSpellBlockMod:"%MR";
-//   PercentArmorMod:"%Armor";
-//   PercentCritChanceMod:"%Crit";
-//   PercentHPPoolMod:"%HP";
-//   PercentMPPoolMod:"%MP";
-//   PercentLifeStealMod:"%LS";
-
-//   PercentSpellVampMod:"%SV";
-//   FlatBlockMod:"Block";
-//   PercentBlockMod:"%Block";
-//   FlatEnergyRegenMod:"ER";
-//   PercentEnergyRegenMod:"%ER";
-//   FlatEnergyPoolMod:"EP";
-//   PercentEnergyPoolMod:"%EP";
-//   FlatCritDamageMod:"CD";
-//   PercentCritDamageMod:"%CD";
-//   FlatEXPBonus:"EXP";
-//   PercentEXPBonus:"%EXP";
-//   FlatHPPoolMod:"HP";
-
-// };
-//filter not in store ! and ornn upgrades with following fields :
-// inStore: boolean;
-// requiredAlly: string;
-
-// type stats = {
-//   hp: number;
-//   ad: number;
-//   ap: number;
-//   as: number;
-//   // cdr: number; //ability haste not in stats
-//   mr: number;
-//   armor: number;
-//   ms: number;
-// };
 
 type item = {
   id: string;
