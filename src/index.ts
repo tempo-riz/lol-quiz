@@ -9,4 +9,4 @@ env.config();
 const server = new Server();
 setTimeout(() => {
   server.run();
-}, 2000);
+}, 1000);

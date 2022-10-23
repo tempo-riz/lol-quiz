@@ -9,10 +9,7 @@ works only on linux (no cp on windows... cmdline)
 
 # todo
 
-- create questions (spell and skins missing)
-- implement audio/image
-- prevent double tap/from multiple player (take only first event into account for each round)
-
+- create more questions
 - better interface
 - responsive for mobile (xd)
 

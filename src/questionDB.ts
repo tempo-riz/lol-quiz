@@ -4,6 +4,10 @@ function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function random(max: number) {
+  return randInt(0, max);
+}
+
 class QuestionDB {
   usedRandoms: number[] = [];
   champs: Array<champion> = [];
@@ -12,10 +16,10 @@ class QuestionDB {
   legendary: item[];
   items: item[] = [];
   boots: item[];
-  questions: Array<question>;
+  skinlines: Array<string>;
 
   //gererate random number that haven't been generated before
-  random(max: number): number {
+  uniqueRandom(max: number): number {
     let rand;
     do {
       rand = randInt(0, max);
@@ -26,29 +30,33 @@ class QuestionDB {
   }
 
   RandomAndClear(max: number): number {
-    const rand = this.random(max);
+    const rand = this.uniqueRandom(max);
     this.usedRandoms = [];
     return rand;
   }
 
   getRandomLegendary(): item {
-    return this.legendary[this.random(this.legendary.length - 1)];
+    return this.legendary[this.uniqueRandom(this.legendary.length - 1)];
   }
 
   getRandomMythic(): item {
-    return this.mythics[this.random(this.mythics.length - 1)];
+    return this.mythics[this.uniqueRandom(this.mythics.length - 1)];
   }
 
   getRandomItem(): item {
-    return this.items[this.random(this.items.length - 1)];
+    return this.items[this.uniqueRandom(this.items.length - 1)];
   }
 
   getRandomOrnnUpgrade(): item {
-    return this.ornnUpgrades[this.random(this.ornnUpgrades.length - 1)];
+    return this.ornnUpgrades[this.uniqueRandom(this.ornnUpgrades.length - 1)];
   }
 
   getRandomChamp(): champion {
-    return this.champs[this.random(this.champs.length - 1)];
+    return this.champs[this.uniqueRandom(this.champs.length - 1)];
+  }
+
+  getRandomSkinline(): string {
+    return this.skinlines[this.uniqueRandom(this.skinlines.length - 1)];
   }
 
   getRandomOrnnQuestion(): question {
@@ -149,6 +157,53 @@ class QuestionDB {
       correct_answer: value.toString(),
       incorrect_answers: [(value + 5).toString(), (value - 5).toString(), (value - 10).toString()]
     };
+    this.usedRandoms = []; //clear used randoms
+
+    return question;
+  }
+
+  getRandomSpellQuestion(): question {
+    const champ = this.getRandomChamp();
+    const spell = champ.spells[random(3)];
+
+    const question: question = {
+      type: questionType.Spell,
+      difficulty: 5,
+      question: `${spell.name} belongs to which champ ?`,
+      correct_answer: champ.name,
+      incorrect_answers: [this.getRandomChamp().name, this.getRandomChamp().name, this.getRandomChamp().name]
+    };
+    this.usedRandoms = []; //clear used randoms
+
+    return question;
+  }
+
+  getRandomSkinQuestion(): question {
+    //get a random skinline and find a champ with that skinline
+    let champ;
+    let skinline: string;
+    do {
+      skinline = this.getRandomSkinline();
+      champ = this.champs.find((champ) => champ.skins.some((skin) => skin.name.includes(skinline)));
+    } while (!champ);
+    this.usedRandoms = []; //clear used randoms
+    //find 3 others champ without that skinline
+    const otherChamps: champion[] = [];
+
+    while (otherChamps.length < 3) {
+      const otherChamp = this.getRandomChamp();
+      if (otherChamp.skins.some((skin) => skin.name.includes(skinline))) continue;
+      otherChamps.push(otherChamp);
+    }
+    this.usedRandoms = []; //clear used randoms
+
+    const question: question = {
+      type: questionType.Skin,
+      difficulty: 5,
+      question: `Which champ has a ${skinline} skin ?`,
+      correct_answer: champ.name,
+      incorrect_answers: otherChamps.map((champ) => champ.name)
+    };
     return question;
   }
 
@@ -177,25 +232,23 @@ class QuestionDB {
         return this.getRandomVoiceQuestion();
       case questionType.Sfx:
         return this.getRandomSfxQuestion();
-      // not yet implemented
-      // case questionType.Spell:
-      //   return this.getRandomSpellQuestion();
-      // case questionType.Skin:
-      //   return this.getRandomSkinQuestion();
+      case questionType.Spell:
+        return this.getRandomSpellQuestion();
+      case questionType.Skin:
+        return this.getRandomSkinQuestion();
       case questionType.Stat:
         return this.getRandomStatQuestion();
     }
-    return this.getRandomQuestion(); //retry
+    return this.getRandomQuestion(); //else retry
   }
 
-  generateQuestions(): Array<question> {
-    //todo
-    return [];
-  }
-
-  constructor() {
-    //create array of questions
-    this.questions = this.generateQuestions();
+  getXQuestions(x: number): question[] {
+    const questions: question[] = [];
+    for (let i = 0; i < x; i++) {
+      questions.push(this.getRandomQuestion());
+      this.usedRandoms = []; //clear used randoms
+    }
+    return questions;
   }
 }
 

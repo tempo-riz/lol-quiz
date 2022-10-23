@@ -207,3 +207,11 @@ i {
     cursor: pointer;
     border-color: white;
 }
+
+.fa-copy:active {
+    color: black;
+}
+
+.fa-copy:hover {
+    cursor: pointer;
+}

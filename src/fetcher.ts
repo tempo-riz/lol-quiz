@@ -38,6 +38,24 @@ class Fetcher {
     });
   }
 
+  async loadSkinlines(): Promise<void> {
+    console.time('skinlines loaded');
+    fetch(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/skinlines.json`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+      .then((response) => response.json())
+      .then((content: Array<{ id: number; name: string; description: string }>) => {
+        this.db.skinlines = content.map((skinline) => skinline.name);
+        //remove first index (empty name "")
+        this.db.skinlines.shift();
+
+        console.timeEnd('skinlines loaded');
+      });
+  }
+
   //get extra info about a champion
   async getChampInfo(champName: string): Promise<champion> {
     return new Promise((resolve, reject) => {
@@ -202,11 +220,8 @@ class Fetcher {
     try {
       this.setDragonVersion().then(() => {
         this.loadChamps();
-        this.loadItems().then(() => {
-          // console.log(this.items.length);
-          // console.log(this.ornnUpgrades.length);
-          // console.log(this.ornnUpgrades.map((item) => item.name));
-        });
+        this.loadItems();
+        this.loadSkinlines();
       });
     } catch (error) {
       console.log(error);

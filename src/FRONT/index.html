@@ -45,10 +45,12 @@
     </div>
     <div id="modal" onsubmit="event.preventDefault()" class="modal">
 
-        <div class="modal-content">
+        <div class="modal-content" id="modal-content">
             <div class="modal-top">Chose a username</div>
             <input id="username" class="modal-input" placeholder="théodule" type="text" required>
-            <button class="modal-button" onclick="login()">join room</button>
+            <button class="modal-button" onclick="join()">join room</button>
+            <button class="modal-button" onclick="create()">create room</button>
+
         </div>
     </div>
 
