@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const API_URL = "http://localhost:8080";
+const API_URL = "https://quiz-lol.herokuapp.com/";
 
 const modal = document.getElementById("modal");
 const modalContent = document.getElementById('modal-content');
