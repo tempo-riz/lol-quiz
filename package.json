@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./build && tsc && cp -r ./src/FRONT ./build/FRONT",
     "lint": "eslint . --ext .ts",
     "prettier-format": "prettier --config .prettierrc './src/**/*.ts' --write",
+
+    "build": "rm -rf ./build && tsc && cp -r ./src/FRONT ./build/FRONT",
     "start:dev": "nodemon",
-    "start": "npm run build && node build/index.js"
+    "start": "node build/index.js",
+    "postinstall": "tsc && cp -r ./src/FRONT ./build/FRONT"
   },
   "repository": {
     "type": "git",
