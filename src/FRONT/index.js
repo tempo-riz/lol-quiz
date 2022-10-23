@@ -89,6 +89,7 @@ var isHost = false;
 function copy(str) {
     navigator.clipboard.writeText(str);
 }
+
 socket.on('wait', (players, _isHost, roomId) => {
 
     if (_isHost) { //so it doesnt reset the host
@@ -120,13 +121,12 @@ let audio;
 function replayAudio() {
     audio.play();
     audio_container.style.visibility = "hidden";
-
 }
 
 socket.on('newTurn', (q, crt, max, players) => {
     sidePanel.style.display = "block";
     audio_container.style.visibility = "hidden";
-
+    canPick = false;
 
     console.log(q.type);
     if (q.type == "Voiceline" || q.type == "Sfx") {
