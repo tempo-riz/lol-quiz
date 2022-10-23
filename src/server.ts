@@ -34,10 +34,10 @@ class Server {
   }
 
   run() {
-    const port = Number(process.env.API_PORT);
-    const ip = String(process.env.API_IP);
-    this.server.listen(port, ip, () => {
-      console.log(`Server started on http://${ip}:${port}`);
+    const port = Number(process.env.PORT) || 3000;
+    // const ip = String(process.env.API_IP);
+    this.server.listen(port, () => {
+      console.log(`Server started on port ${port}`);
     });
   }
 }
