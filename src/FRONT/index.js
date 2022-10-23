@@ -107,6 +107,10 @@ socket.on('wait', (players, _isHost, roomId) => {
     modalContent.innerHTML = html;
 })
 
+socket.on('newHost', () => {
+    isHost = true;
+})
+
 socket.on('error', (msg) => {
     alert(msg);
 })

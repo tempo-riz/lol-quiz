@@ -20,6 +20,7 @@ type room = {
   crtQuestionIndex: number;
   crtRound: number;
   nbRounds: number;
+  started: boolean;
 };
 
 class ServerIO extends IO.Server {
@@ -81,7 +82,8 @@ class ServerIO extends IO.Server {
         crtQuestion: null,
         crtQuestionIndex: 0,
         crtRound: 0,
-        nbRounds: nb_round
+        nbRounds: nb_round,
+        started: false
       };
 
       this.rooms.push(r);
@@ -113,6 +115,13 @@ class ServerIO extends IO.Server {
       if (r.players.find((p) => p.username == username)) {
         console.log('username already taken');
         this.error('username already taken', socket);
+        return;
+      }
+
+      //check that game didnt start
+      if (r.started) {
+        console.log('game already started');
+        this.error('game already started, wait next round !', socket);
         return;
       }
 
@@ -151,6 +160,7 @@ class ServerIO extends IO.Server {
         });
         r.questions = this.db.getXQuestions(r.nbRounds);
       }
+      r.started = true;
       this.newTurn(r);
     });
 
@@ -187,10 +197,26 @@ class ServerIO extends IO.Server {
     });
 
     socket.on('disconnect', () => {
-      console.log('user disconnected');
+      const r = this.getRoom(socket);
+      const p = r.players.find((p) => p.socketId == socket.id);
+      console.log(p.username + ' disconnected');
+      //remove player from room
+      r.players = r.players.filter((p) => p.socketId != socket.id);
 
-      // console.log(this.players.filter((p) => p.socketId != socket.id)[0]?.username + ' left room');
-      // this.players = this.players.filter((p) => p.socketId != socket.id);
+      //if no more players, delete room
+      if (r.players.length == 0) {
+        console.log('room ' + r.roomId + ' deleted');
+        this.rooms = this.rooms.filter((r) => r.roomId != socket.id);
+        return;
+      }
+
+      //if host, change host
+      if (r.host.socketId == socket.id) {
+        console.log('new host : ' + r.players[0].username);
+        r.host = r.players[0];
+        //notify new host
+        this.to(p.socketId).emit('newHost', r.host.username);
+      }
     });
   }
 
@@ -203,7 +229,7 @@ class ServerIO extends IO.Server {
 
   gameOver(r: room) {
     console.log('game over');
-
+    r.started = false;
     this.to(r.roomId).emit('gameOver', r.players);
   }
 
